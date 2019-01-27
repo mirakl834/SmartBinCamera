@@ -32,6 +32,10 @@ import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     TextView tvHelloWord;
+    TextView tvId;
+    TextView tvCat;
+    TextView tvInstr;
+    TextView tvBinCat;
     Button btnSort;
     ImageView ivPicture;
     private static final int CAMERA_REQUEST = 1888;
@@ -42,16 +46,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.tvHelloWord = (TextView) findViewById(R.id.tvHelloWorld);
         this.btnSort = findViewById(R.id.btnSort);
         this.btnSort.setOnClickListener(this);
         this.ivPicture = findViewById(R.id.ivCameraPicture);
+        this.tvId = findViewById(R.id.tvId);
+        this.tvCat = findViewById(R.id.tvObjCat);
+        this.tvInstr = findViewById(R.id.tvSpInstr);
+        this.tvBinCat = findViewById(R.id.tvCat);
 
         this.context = getApplicationContext();
     }
 
-    private void setText(String s) {
-        this.tvHelloWord.setText(s);
+    private void setText(String id, String category,String binCat, String instructions) {
+        this.tvId.setText(id);
+        this.tvCat.setText(category);
+        this.tvInstr.setText(instructions);
+        this.tvBinCat.setText(binCat);
     }
 
     @Override
@@ -83,9 +93,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                     startActivityForResult(cameraIntent, CAMERA_REQUEST);
+                    clearOutput();
                 }
                 break;
         }
+    }
+
+    private void clearOutput() {
+        this.tvBinCat.setText("");
+        this.tvId.setText("");
+        this.tvCat.setText("");
+        this.tvInstr.setText("");
+        this.ivPicture.setImageBitmap(null);
     }
 
     @Override
@@ -115,7 +134,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     // If the response is JSONObject instead of expected JSONArray
-                    setText(response.toString());
+                    String id="";
+                    String cat="";
+                    String inst="";
+                    String binCat="";
+
+                    try{
+                        id = response.getString("id");
+                        cat = response.getString("categorie");
+                        binCat =response.getString("type-collecte");
+                        inst = response.getString("instructions-speciales");
+                    }catch (Exception e ){
+
+                    }
+
+                    setText(id,cat,binCat,inst);
+
+
                 }
             });
         } catch (IOException e){
